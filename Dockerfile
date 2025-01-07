@@ -1,4 +1,4 @@
-FROM node:20.18
+FROM node:20-alpine3.21
 
 RUN npm i -g pnpm
 
