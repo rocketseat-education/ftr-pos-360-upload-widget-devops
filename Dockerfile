@@ -20,7 +20,7 @@ COPY --from=dependencies /usr/src/app/node_modules ./node_modules
 RUN pnpm build
 RUN pnpm prune --prod
 
-FROM node:20-alpine3.21 AS deploy
+FROM cgr.dev/chainguard/node:latest AS deploy
 
 USER 1000
 
@@ -38,4 +38,4 @@ ENV CLOUDFLARE_PUBLIC_URL="http://localhost"
 
 EXPOSE 3333
 
-CMD ["node", "dist/server.mjs"]
+CMD ["dist/server.mjs"]
