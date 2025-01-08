@@ -14,6 +14,23 @@ jobs:
         id: checkout
         uses: actions/checkout@v4
 
+      - name: Configure Node
+        id: configure-node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      
+      - name: Install pnpm
+        id: install-pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8
+
+      - name: Install dependencies
+        id: install-dependencies
+        run: |
+          pnpm Install
+
       - name: Configure AWS Credentials
         id: configure-aws-credentials
         uses: aws-actions/configure-aws-credentials@v4
