@@ -1,0 +1,12 @@
+services:
+  app:
+    build: .
+    container_name: widget-server
+    ports:
+      - 3000:3333
+    environment:
+      - CLOUDFLARE_ACCESS_KEY_ID=#
+      - CLOUDFLARE_SECRET_ACCESS_KEY=#
+      - CLOUDFLARE_BUCKET=#
+      - CLOUDFLARE_ACCOUNT_ID=#
+      - CLOUDFLARE_PUBLIC_URL=http://localhost
