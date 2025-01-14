@@ -11,9 +11,14 @@ services:
       - POSTGRES_DB=widget_server
     volumes:
       - db:/var/lib/postgresql/data
+    networks:
+      - widget
+      - db
 
   app:
     build: .
+    depends_on:
+      - db
     container_name: widget-server
     ports:
       - 3000:3333
@@ -23,6 +28,13 @@ services:
       - CLOUDFLARE_BUCKET=#
       - CLOUDFLARE_ACCOUNT_ID=#
       - CLOUDFLARE_PUBLIC_URL=http://localhost
+    networks:
+      - widget
 
 volumes:
   db:
+networks:
+    widget:
+      driver: bridge
+    db:
+      driver: bridge
