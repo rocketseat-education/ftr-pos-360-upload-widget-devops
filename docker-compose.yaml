@@ -9,6 +9,8 @@ services:
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=root
       - POSTGRES_DB=widget_server
+    volumes:
+      - db:/var/lib/postgresql/data
 
   app:
     build: .
@@ -21,3 +23,6 @@ services:
       - CLOUDFLARE_BUCKET=#
       - CLOUDFLARE_ACCOUNT_ID=#
       - CLOUDFLARE_PUBLIC_URL=http://localhost
+
+volumes:
+  db:
