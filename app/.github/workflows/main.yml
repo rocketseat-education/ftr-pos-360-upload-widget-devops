@@ -84,14 +84,18 @@ jobs:
             ${{steps.login-ecr.outputs.registry}}/${{ vars.ECR_REPOSITORY }}:${{ steps.generate-tag.outputs.sha }}
 
       - name: Deploy to App Runner
-        id: deploy-to-app-Runner
+        id: deploy-app-runner
         uses: awslabs/amazon-app-runner-deploy@main
         with:
-          service: widget-server
+          service: ${{ vars.APP_RUNNER_SERVICE_NAME }}
           image: ${{steps.login-ecr.outputs.registry}}/${{ vars.ECR_REPOSITORY }}:${{ steps.generate-tag.outputs.sha }}
           region: ${{ vars.AWS_REGION }}
-          access-role-arn: ''
+          access-role-arn: ${{ secrets.ROLE_ARN }}
           cpu: 1
           memory: 2
           port: 3333
+          wait-for-service-stability-seconds: 180
+
+      - name: App Runner Check
+        run: echo "App running... ${{ steps.deploy-app-runner.outputs.service-url }}"
 
