@@ -83,6 +83,23 @@ jobs:
           tags: |
             ${{steps.login-ecr.outputs.registry}}/${{ vars.ECR_REPOSITORY }}:${{ steps.generate-tag.outputs.sha }}
 
+      - name: Render task definition
+        id: reder-task-definition
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: .aws/task-definition.json
+          container-name: widget-server
+          image: ${{steps.login-ecr.outputs.registry}}/${{ vars.ECR_REPOSITORY }}:${{ steps.generate-tag.outputs.sha }}
+
+      - name: Deploy Amazon ECS
+        id: deploy-amazon-ecs
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ steps.reder-task-definition.outputs.task-definition }}
+          service: widget-server
+          cluster: rocketseat-ecs
+          wait-for-service-stability: true
+
       # - name: Deploy to App Runner
       #   id: deploy-app-runner
       #   uses: awslabs/amazon-app-runner-deploy@main
