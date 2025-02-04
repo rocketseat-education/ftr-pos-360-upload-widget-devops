@@ -74,6 +74,7 @@ jobs:
           severity: 'CRITICAL,HIGH,MEDIUM,LOW'
       
       - name: Build and push the image to AWS ECR
+        id: build-and-push-the-image-to-aws-ecr
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -82,12 +83,15 @@ jobs:
           tags: |
             ${{steps.login-ecr.outputs.registry}}/${{ vars.ECR_REPOSITORY }}:${{ steps.generate-tag.outputs.sha }}
 
-      #- name: Build and push the image to AWS ECR
-      #  id: build-push-image
-      #  env:
-      #    ECR_REGISTRY: ${{steps.login-ecr.outputs.registry}}
-      #    ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
-      #    IMAGE_TAG: ${{ steps.generate-tag.outputs.sha }}
-      #  run: |
-      #    docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-      #    docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+      - name: Deploy to App Runner
+        id: deploy-to-app-Runner
+        uses: awslabs/amazon-app-runner-deploy@main
+        with:
+          service: widget-server
+          image: ${{steps.login-ecr.outputs.registry}}/${{ vars.ECR_REPOSITORY }}:${{ steps.generate-tag.outputs.sha }}
+          region: ${{ vars.AWS_REGION }}
+          access-role-arn: ''
+          cpu: 1
+          memory: 2
+          port: 3333
+
