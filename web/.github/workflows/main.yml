@@ -6,9 +6,10 @@ on:
       - main
 
 env:
-  AWS_S3_BUCKET_STATIC: rocketseat-upload-widget-web-static
-  AWS_S3_BUCKET_CDN: rocketseat-upload-widget-web-cdn
-  SOURCE_DIST: ./dist
+  # AWS_S3_BUCKET_STATIC: rocketseat-upload-widget-web-static
+  # AWS_S3_BUCKET_CDN: rocketseat-upload-widget-web-cdn
+  # SOURCE_DIST: ./dist
+  A: 'a'
 
 jobs:
   deploy:
@@ -29,40 +30,60 @@ jobs:
         uses: pnpm/action-setup@v4
         with:
           version: 9
-
-      - name: Install dependencies
-        id: install-dependencies
+      
+      - name: Install vercel
+        id: install-vercel
         run: |
-          pnpm install
+          npm install --global vercel@latest
+
+      - name: Pull vercel config
+        id: pull-vercel-config
+        run: |
+          vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Build app
         id: build-app
         run: |
-          pnpm run build
-
-      - name: Configure AWS credentials
-        id: configure-aws-credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ vars.AWS_REGION }}
-
-      - name: Sync files to S3 static
-        id: sync-files-to-s3-static
+          vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+      
+      - name: Deploy app
+        id: deploy-app
         run: |
-          aws s3 sync ${{ env.SOURCE_DIST }} \
-          s3://${{ env.AWS_S3_BUCKET_STATIC }}/ --delete --exclude '.*git*'
+          vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
 
-      - name: Sync files to S3 CDN
-        id: sync-files-to-s3-cdn
-        run: |
-          aws s3 sync ${{ env.SOURCE_DIST }} \
-          s3://${{ env.AWS_S3_BUCKET_CDN }}/ --delete --exclude '.*git*'
+      # - name: Install dependencies
+      #   id: install-dependencies
+      #   run: |
+      #     pnpm install
 
-      - name: Invalidate CDN cache
-        id: invalidate-cdn-cache
-        run: |
-          aws cloudfront create-invalidation \
-          --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
-          --paths "/*"
+      # - name: Build app
+      #   id: build-app
+      #   run: |
+      #     pnpm run build
+
+      # - name: Configure AWS credentials
+      #   id: configure-aws-credentials
+      #   uses: aws-actions/configure-aws-credentials@v4
+      #   with:
+      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     aws-region: ${{ vars.AWS_REGION }}
+
+      # - name: Sync files to S3 static
+      #   id: sync-files-to-s3-static
+      #   run: |
+      #     aws s3 sync ${{ env.SOURCE_DIST }} \
+      #     s3://${{ env.AWS_S3_BUCKET_STATIC }}/ --delete --exclude '.*git*'
+
+      # - name: Sync files to S3 CDN
+      #   id: sync-files-to-s3-cdn
+      #   run: |
+      #     aws s3 sync ${{ env.SOURCE_DIST }} \
+      #     s3://${{ env.AWS_S3_BUCKET_CDN }}/ --delete --exclude '.*git*'
+
+      # - name: Invalidate CDN cache
+      #   id: invalidate-cdn-cache
+      #   run: |
+      #     aws cloudfront create-invalidation \
+      #     --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
+      #     --paths "/*"
