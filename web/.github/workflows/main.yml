@@ -51,9 +51,18 @@ jobs:
       - name: Sync files to S3 static
         id: sync-files-to-s3-static
         run: |
-          aws s3 sync ${{ env.SOURCE_DIST }} s3://${{ env.AWS_S3_BUCKET_STATIC }}/ --delete --exclude '.*git*'
+          aws s3 sync ${{ env.SOURCE_DIST }} \
+          s3://${{ env.AWS_S3_BUCKET_STATIC }}/ --delete --exclude '.*git*'
 
       - name: Sync files to S3 CDN
         id: sync-files-to-s3-cdn
         run: |
-          aws s3 sync ${{ env.SOURCE_DIST }} s3://${{ env.AWS_S3_BUCKET_CDN }}/ --delete --exclude '.*git*'
+          aws s3 sync ${{ env.SOURCE_DIST }} \
+          s3://${{ env.AWS_S3_BUCKET_CDN }}/ --delete --exclude '.*git*'
+
+      - name: Invalidate CDN cache
+        id: invalidate-cdn-cache
+        run: |
+          aws cloudfront create-invalidation \
+          --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
+          --paths "/*"
