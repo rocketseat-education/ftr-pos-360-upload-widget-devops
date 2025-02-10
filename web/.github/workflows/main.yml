@@ -9,7 +9,8 @@ env:
   # AWS_S3_BUCKET_STATIC: rocketseat-upload-widget-web-static
   # AWS_S3_BUCKET_CDN: rocketseat-upload-widget-web-cdn
   # SOURCE_DIST: ./dist
-  A: 'a'
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
 jobs:
   deploy:
