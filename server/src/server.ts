@@ -6,9 +6,11 @@ import { fastifyMultipart } from '@fastify/multipart'
 import { log } from './infra/logger'
 import { GetParameterCommand, SSMClient } from '@aws-sdk/client-ssm'
 //import { DecryptCommand, KMSClient } from '@aws-sdk/client-kms'
+import { GetSecretValueCommand, SecretsManagerClient } from '@aws-sdk/client-secrets-manager'
 
 const ssm = new SSMClient({ region: 'us-east-2' })
 //const kms = new KMSClient({ region: 'us-east-2' })
+const secretManager = new SecretsManagerClient({ region: 'us-east-2' })
 
 const server = fastify()
 
@@ -26,6 +28,8 @@ server.listen({ port: 3333, host: '0.0.0.0' }).then(async () => {
     { Name: 'CLOUDFLARE_ACCESS_KEY_ID', WithDecryption: true }
   ))
   console.log(value.Parameter?.Value)
+  const secret = await secretManager.send(new GetSecretValueCommand({ SecretId: 'stg/widget-server' }))
+  console.log(JSON.parse(secret.SecretString))
   //if (value.Parameter?.Value) {
   //  const command = new DecryptCommand({
   //    CiphertextBlob: Buffer.from(value.Parameter.Value, 'base64')
